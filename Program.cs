@@ -19,9 +19,6 @@ builder.Services.AddScoped<IClientService, ClientService>();
 
 
 
-// Registrar el Background Service para actualizar datos.
-builder.Services.AddHostedService<DataUpdaterService>();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost3000", policy =>
