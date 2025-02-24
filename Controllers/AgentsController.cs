@@ -2,24 +2,27 @@ using Microsoft.AspNetCore.Mvc;
 using ContactCenterAPI.Models;
 using ContactCenterAPI.Services.Interfaces;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using ContactCenterAPI.Repositories.Interfaces;
 
 
 namespace ContactCenterAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/agents")]
     public class AgentsController : ControllerBase
     {
-        private readonly IAgentService _agentService;
-        public AgentsController(IAgentService agentService)
+        private readonly IAgentRepository _agentRepository;
+
+        public AgentsController(IAgentRepository agentRepository)
         {
-            _agentService = agentService;
+            _agentRepository = agentRepository;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Agent>> GetAgents()
+        public IActionResult GetAgents([FromQuery] string? state)
         {
-            var agents = _agentService.GetAgents();
+            var agents = _agentRepository.GetAllAgents(state);
             return Ok(agents);
         }
     }
