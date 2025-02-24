@@ -1,19 +1,22 @@
 using ContactCenterAPI.Models;
 using ContactCenterAPI.Repositories.Interfaces;
-
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ContactCenterAPI.Repositories.Implementations
 {
     public class AgentRepository : IAgentRepository
     {
-        // Datos simulados. En un escenario real se usaría acceso a base de datos.
-        private readonly List<Agent> _agents = new List<Agent>
+        public IEnumerable<Agent> GetAllAgents()
         {
-            new Agent { Id = 1, Name = "Carlos", State = "available", WaitTime = 5 },
-            new Agent { Id = 2, Name = "Ana", State = "busy", WaitTime = 10 },
-            new Agent { Id = 3, Name = "Luis", State = "paused", WaitTime = 3 }
-        };
-
-        public IEnumerable<Agent> GetAllAgents() => _agents;
+            var agentsData = WebSocketHandler.GetLatestAgentsData();
+            return agentsData.Select(a => new Agent
+            {
+                Id = (int)a.GetType().GetProperty("id")?.GetValue(a),
+                Name = (string)a.GetType().GetProperty("name")?.GetValue(a),
+                State = (string)a.GetType().GetProperty("status")?.GetValue(a),
+                WaitTime = (int)a.GetType().GetProperty("waitTime")?.GetValue(a)
+            }).ToList();
+        }
     }
 }
