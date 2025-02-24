@@ -1,11 +1,17 @@
 using System.Net.WebSockets;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
-
+using System;
+using System.Linq;
 public static class WebSocketHandler
 {
     private static readonly List<WebSocket> agentSockets = new();
     private static readonly List<WebSocket> clientSockets = new();
+    private static List<object> latestAgentsData = new(); 
+    private static List<object> latestClientsData = new();
     private static readonly Random random = new();
 
     public static async Task HandleWebSocket(string path, WebSocket webSocket)
@@ -17,7 +23,7 @@ public static class WebSocketHandler
         {
             while (webSocket.State == WebSocketState.Open)
             {
-                await Task.Delay(30000); // Simular actualización cada 30s
+                await Task.Delay(10000); // Simular actualización cada 30s
                 await SendUpdatedData(socketList, path);
             }
         }
@@ -38,20 +44,20 @@ public static class WebSocketHandler
         var json = JsonSerializer.Serialize(data);
         var buffer = Encoding.UTF8.GetBytes(json);
 
-    List<WebSocket> socketsCopy;
-    lock (sockets)
-    {
-        socketsCopy = sockets.ToList();
-    }
-
-    await Parallel.ForEachAsync(socketsCopy, async (socket, _) =>
-    {
-        if (socket.State == WebSocketState.Open)
+        List<WebSocket> socketsCopy;
+        lock (sockets)
         {
-            await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            socketsCopy = sockets.ToList();
         }
-    });
-}
+
+        await Parallel.ForEachAsync(socketsCopy, async (socket, _) =>
+        {
+            if (socket.State == WebSocketState.Open)
+            {
+                await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+        });
+    }
 
     private static List<object> GenerateAgentsData()
     {
@@ -79,4 +85,20 @@ public static class WebSocketHandler
         var statuses = new[] { "available", "busy", "paused" };
         return statuses[random.Next(statuses.Length)];
     }
+ public static List<object> GetLatestAgentsData()
+    {
+        lock (latestAgentsData)
+        {
+            return latestAgentsData;
+        }
+    }
+public static List<object> GetLatestClientsData()
+    {
+        lock (latestClientsData)
+        {
+            return latestClientsData;
+        }
+    }
+
+
 }
