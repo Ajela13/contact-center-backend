@@ -6,12 +6,15 @@ using System.Text;
 using System.Text.Json;
 using System;
 using System.Linq;
+
 public static class WebSocketHandler
 {
     private static readonly List<WebSocket> agentSockets = new();
     private static readonly List<WebSocket> clientSockets = new();
-    private static List<object> latestAgentsData = new(); 
+    
+    private static List<object> latestAgentsData = new();
     private static List<object> latestClientsData = new();
+
     private static readonly Random random = new();
 
     public static async Task HandleWebSocket(string path, WebSocket webSocket)
@@ -41,14 +44,15 @@ public static class WebSocketHandler
     private static async Task SendUpdatedData(List<WebSocket> sockets, string path)
     {
         var data = path == "/ws/agents" ? GenerateAgentsData() : GenerateClientsData();
+        
+        if (path == "/ws/agents") latestAgentsData = data;
+        if (path == "/ws/clients") latestClientsData = data;
+        
         var json = JsonSerializer.Serialize(data);
         var buffer = Encoding.UTF8.GetBytes(json);
 
         List<WebSocket> socketsCopy;
-        lock (sockets)
-        {
-            socketsCopy = sockets.ToList();
-        }
+         lock (sockets) { socketsCopy = sockets.ToList(); }
 
         await Parallel.ForEachAsync(socketsCopy, async (socket, _) =>
         {
