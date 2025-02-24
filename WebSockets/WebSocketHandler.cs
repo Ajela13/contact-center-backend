@@ -17,7 +17,7 @@ public static class WebSocketHandler
         {
             while (webSocket.State == WebSocketState.Open)
             {
-                await Task.Delay(30000); // Simular actualización cada 5s
+                await Task.Delay(30000); // Simular actualización cada 30s
                 await SendUpdatedData(socketList, path);
             }
         }
