@@ -38,17 +38,20 @@ public static class WebSocketHandler
         var json = JsonSerializer.Serialize(data);
         var buffer = Encoding.UTF8.GetBytes(json);
 
-        lock (sockets)
-        {
-            foreach (var socket in sockets)
-            {
-                if (socket.State == WebSocketState.Open)
-                {
-                    socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-            }
-        }
+    List<WebSocket> socketsCopy;
+    lock (sockets)
+    {
+        socketsCopy = sockets.ToList();
     }
+
+    await Parallel.ForEachAsync(socketsCopy, async (socket, _) =>
+    {
+        if (socket.State == WebSocketState.Open)
+        {
+            await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+    });
+}
 
     private static List<object> GenerateAgentsData()
     {
