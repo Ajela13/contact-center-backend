@@ -1,0 +1,28 @@
+# Directorios generados por la compilación
+bin/
+obj/
+
+# Configuraciones y archivos temporales de Visual Studio
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Paquetes NuGet y directorios de paquetes
+*.nupkg
+.nuget/
+
+# Archivos y carpetas de Rider (JetBrains)
+.idea/
+
+# Resultados de pruebas
+TestResults/
+
+# Archivos de log
+*.log
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
