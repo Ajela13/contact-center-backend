@@ -5,6 +5,6 @@ namespace ContactCenterAPI.Repositories.Interfaces
 {
     public interface IClientRepository
     {
-        IEnumerable<Client> GetAllClients();
+        IEnumerable<Client> GetAllClients(int? maxWaitTime = null);
     }
 }
