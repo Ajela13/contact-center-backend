@@ -2,9 +2,9 @@ namespace ContactCenterAPI.Models
 {
     public class Agent
     {
-        public int Id { get; set; }  // Identificador (útil para persistencia)
-        public string Name { get; set; }
-        public string State { get; set; }  // "available", "busy", "paused"
-        public int WaitTime { get; set; }
+        public required int Id { get; set; }  // Identificador (útil para persistencia)
+        public required string Name { get; set; }
+        public required string State { get; set; }  // "available", "busy", "paused"
+        public required int WaitTime { get; set; }
     }
 }
