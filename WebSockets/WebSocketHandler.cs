@@ -19,6 +19,10 @@ public static class WebSocketHandler
 
     static WebSocketHandler()
     {
+        latestAgentsData = GenerateAgentsData();
+        latestClientsData = GenerateClientsData();
+        Task.Run(async () => await BroadcastUpdatedData());
+        
         // Iniciar la actualización automática cada 5 segundos
         Task.Run(async () =>
         {
@@ -39,6 +43,8 @@ public static class WebSocketHandler
 
         try
         {
+            await SendUpdatedData(socketList, path);
+
             while (webSocket.State == WebSocketState.Open)
             {
                 await Task.Delay(5000); // Enviar datos cada 5 segundos
@@ -76,6 +82,12 @@ public static class WebSocketHandler
         });
     }
 
+    private static string GetRandomStatus()
+    {
+        var statuses = new[] { "available", "busy", "paused" };
+        return statuses[random.Next(statuses.Length)];
+    }
+
     private static List<object> GenerateAgentsData()
     {
         return Enumerable.Range(1, 10).Select(id => new
@@ -95,12 +107,6 @@ public static class WebSocketHandler
             name = $"Client {id}",
             waitTime = random.Next(1, 21)
         }).ToList<object>();
-    }
-
-    private static string GetRandomStatus()
-    {
-        var statuses = new[] { "available", "busy", "paused" };
-        return statuses[random.Next(statuses.Length)];
     }
 
 public static List<object> GetLatestAgentsData()
