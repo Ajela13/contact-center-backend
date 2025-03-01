@@ -6,6 +6,6 @@ namespace ContactCenterAPI.Services.Interfaces
 {
     public interface IAgentService
     {
-        IEnumerable<Agent> GetAgents();
+        IEnumerable<Agent> GetAgents(string? state = null);
     }
 }
