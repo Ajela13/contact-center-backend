@@ -11,11 +11,26 @@ public static class WebSocketHandler
 {
     private static readonly List<WebSocket> agentSockets = new();
     private static readonly List<WebSocket> clientSockets = new();
-    
+
     private static List<object> latestAgentsData = new();
     private static List<object> latestClientsData = new();
 
     private static readonly Random random = new();
+
+    static WebSocketHandler()
+    {
+        // Iniciar la actualización automática cada 5 segundos
+        Task.Run(async () =>
+        {
+            while (true)
+            {
+                await Task.Delay(5000); // Cada 5 segundos
+                latestAgentsData = GenerateAgentsData();
+                latestClientsData = GenerateClientsData();
+                await BroadcastUpdatedData();
+            }
+        });
+    }
 
     public static async Task HandleWebSocket(string path, WebSocket webSocket)
     {
@@ -26,13 +41,9 @@ public static class WebSocketHandler
         {
             while (webSocket.State == WebSocketState.Open)
             {
-                await Task.Delay(5000); // Simular actualización cada 30s
+                await Task.Delay(5000); // Enviar datos cada 5 segundos
                 await SendUpdatedData(socketList, path);
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error en WebSocket: {ex.Message}");
         }
         finally
         {
@@ -41,18 +52,20 @@ public static class WebSocketHandler
         }
     }
 
+    private static async Task BroadcastUpdatedData()
+    {
+        await SendUpdatedData(agentSockets, "/ws/agents");
+        await SendUpdatedData(clientSockets, "/ws/clients");
+    }
+
     private static async Task SendUpdatedData(List<WebSocket> sockets, string path)
     {
-        var data = path == "/ws/agents" ? GenerateAgentsData() : GenerateClientsData();
-        
-        if (path == "/ws/agents") latestAgentsData = data;
-        if (path == "/ws/clients") latestClientsData = data;
-        
+        var data = path == "/ws/agents" ? latestAgentsData : latestClientsData;
         var json = JsonSerializer.Serialize(data);
         var buffer = Encoding.UTF8.GetBytes(json);
 
         List<WebSocket> socketsCopy;
-         lock (sockets) { socketsCopy = sockets.ToList(); }
+        lock (sockets) { socketsCopy = sockets.ToList(); }
 
         await Parallel.ForEachAsync(socketsCopy, async (socket, _) =>
         {
@@ -78,7 +91,7 @@ public static class WebSocketHandler
     {
         return Enumerable.Range(1, 10).Select(id => new
         {
-            id = id + 10, // Evitar conflicto con IDs de agentes
+            id = id + 10,
             name = $"Client {id}",
             waitTime = random.Next(1, 21)
         }).ToList<object>();
@@ -89,20 +102,21 @@ public static class WebSocketHandler
         var statuses = new[] { "available", "busy", "paused" };
         return statuses[random.Next(statuses.Length)];
     }
- public static List<object> GetLatestAgentsData()
-    {
-        lock (latestAgentsData)
-        {
-            return latestAgentsData;
-        }
-    }
-public static List<object> GetLatestClientsData()
-    {
-        lock (latestClientsData)
-        {
-            return latestClientsData;
-        }
-    }
 
+public static List<object> GetLatestAgentsData()
+{
+    lock (latestAgentsData)
+    {
+        return latestAgentsData.ToList();
+    }
+}
+
+public static List<object> GetLatestClientsData()
+{
+    lock (latestClientsData)
+    {
+        return latestClientsData.ToList();
+    }
+}
 
 }
