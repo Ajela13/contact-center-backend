@@ -15,7 +15,7 @@ namespace ContactCenterAPI.Services.Implementations
 
         public IEnumerable<Agent> GetAgents(string? state = null)
         {
-            return _agentRepository.GetAllAgents();
+            return _agentRepository.GetAllAgents(string? state = null);
         }
     }
 }
