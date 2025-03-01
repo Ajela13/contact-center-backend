@@ -15,14 +15,14 @@ namespace ContactCenterAPI.Repositories.Implementations
             {
                 Id = (int)a.GetType().GetProperty("id")?.GetValue(a),
                 Name = (string)a.GetType().GetProperty("name")?.GetValue(a),
-                State = (string)a.GetType().GetProperty("status")?.GetValue(a),
+                Status = (string)a.GetType().GetProperty("status")?.GetValue(a),
                 WaitTime = (int)a.GetType().GetProperty("waitTime")?.GetValue(a)
             });
 
             // Filtrar por estado si se proporciona un valor
             if (!string.IsNullOrEmpty(state))
             {
-                agents = agents.Where(a => a.State.Equals(state, StringComparison.OrdinalIgnoreCase));
+                agents = agents.Where(a => a.Status.Equals(state, StringComparison.OrdinalIgnoreCase));
             }
 
             return agents.ToList();
