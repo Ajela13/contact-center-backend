@@ -16,11 +16,7 @@ namespace ContactCenterAPI.Services.Implementations
 
         public IEnumerable<Client> GetClients(int? maxWaitTime = null)
         {
-<<<<<<< HEAD
             return _clientRepository.GetAllClients(maxWaitTime);
-=======
-            return _clientRepository.GetAllClients(state);
->>>>>>> 51802d469f0644bba536a8d63904470453306b35
         }
     }
 }
