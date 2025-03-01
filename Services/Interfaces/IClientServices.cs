@@ -6,6 +6,6 @@ namespace ContactCenterAPI.Services.Interfaces
 {
     public interface IClientService
     {
-        IEnumerable<Client> GetClients();
+        IEnumerable<Client> GetClients(int? maxWaitTime = null);
     }
 }
