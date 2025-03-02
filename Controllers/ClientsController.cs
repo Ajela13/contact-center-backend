@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using ContactCenterAPI.Models;
 using ContactCenterAPI.Services.Interfaces;
 using System.Collections.Generic;
-using ContactCenterAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContactCenterAPI.Controllers
@@ -11,17 +10,17 @@ namespace ContactCenterAPI.Controllers
     [Route("/clients")]
     public class ClientsController : ControllerBase
     {
-        private readonly IClientRepository _clientRepository;
+        private readonly IClientService _clientService;
 
-        public ClientsController(IClientRepository clientRepository)
+        public ClientsController(IClientService clientService)
         {
-            _clientRepository = clientRepository;
+            _clientService = clientService;
         }
 
         [HttpGet]
         public IActionResult GetClients([FromQuery] int? maxWaitTime)
         {
-            var clients = _clientRepository.GetAllClients(maxWaitTime);
+            var clients = _clientService.GetClients(maxWaitTime);
             return Ok(clients);
         }
     }

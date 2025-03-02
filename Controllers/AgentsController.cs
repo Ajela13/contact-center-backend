@@ -3,7 +3,6 @@ using ContactCenterAPI.Models;
 using ContactCenterAPI.Services.Interfaces;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using ContactCenterAPI.Repositories.Interfaces;
 
 
 namespace ContactCenterAPI.Controllers
@@ -12,17 +11,17 @@ namespace ContactCenterAPI.Controllers
     [Route("/agents")]
     public class AgentsController : ControllerBase
     {
-        private readonly IAgentRepository _agentRepository;
+        private readonly IAgentService _agentService;
 
-        public AgentsController(IAgentRepository agentRepository)
+        public AgentsController(IAgentService agentService)
         {
-            _agentRepository = agentRepository;
+            _agentService = agentService;
         }
 
         [HttpGet]
         public IActionResult GetAgents([FromQuery] string? state)
         {
-            var agents = _agentRepository.GetAllAgents(state);
+            var agents = _agentService.GetAgents(state);
             return Ok(agents);
         }
     }
